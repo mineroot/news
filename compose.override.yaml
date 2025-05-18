@@ -1,0 +1,13 @@
+# Development environment override
+services:
+    develop:
+        build:
+            context: .
+            target: develop
+        ports:
+            - "8080:8080"
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        tty: true
+        volumes:
+            - ./:/app

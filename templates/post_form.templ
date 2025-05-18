@@ -1,0 +1,40 @@
+package templates
+
+templ PostForm(action, title, content, errMessage string) {
+	<form class="bg-white shadow rounded-lg p-6 space-y-4" hx-post={ action }>
+		<div>
+			<label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+			<input
+				type="text"
+				id="title"
+				name="title"
+				class="bg-white text-black border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+				value={ title }
+			/>
+		</div>
+		<div>
+			<label for="content" class="block text-sm font-medium text-gray-700">Content</label>
+			<textarea
+				id="content"
+				name="content"
+				rows="5"
+				class="bg-white text-black border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+			>
+				{ content }
+			</textarea>
+		</div>
+		<button
+			type="submit"
+			class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+		>
+			Save
+		</button>
+		if errMessage != "" {
+			<div class="text-red-600 text-sm mt-2">
+				<pre>
+					{ errMessage }
+				</pre>
+			</div>
+		}
+	</form>
+}

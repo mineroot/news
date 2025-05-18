@@ -1,0 +1,94 @@
+package templates
+
+import "fmt"
+import "github.com/mineroot/news/internal/posts"
+import "github.com/mineroot/news/internal/route"
+import "github.com/mineroot/news/internal/paging"
+
+templ Home(url UrlGenerator, paginatedPosts []*posts.Post, paginator *paging.Paginator, search string) {
+	if len(paginatedPosts) == 0 {
+		if search == "" {
+			<article class="bg-white shadow rounded-lg p-4">
+				<h2 class="text-xl font-semibold">No posts yet</h2>
+				<section>
+					So create it...
+				</section>
+			</article>
+			{{ return }}
+		} else {
+			<article class="bg-white shadow rounded-lg p-4">
+				<h2 class="text-xl font-semibold">No results</h2>
+				<section>
+					Try another one...
+				</section>
+			</article>
+			{{ return }}
+		}
+	}
+	for _, post := range paginatedPosts {
+		<div>
+			<article class="bg-white shadow rounded-lg p-4">
+				<h2 class="text-xl font-semibold">
+					{{ postUrl := templ.URL(url(route.ViewPost, post.ID.Hex())) }}
+					<a
+						hx-get={ string(postUrl) }
+						href={ postUrl }
+					>
+						{ post.Title }
+					</a>
+				</h2>
+				<p class="text-sm text-gray-500 mt-2">
+					Created: { post.Created.Format("2006-01-02 15:04") }
+					if post.Created != post.Updated {
+						&nbsp;|&nbsp;
+						Updated: { post.Updated.Format("2006-01-02 15:04") }
+					}
+				</p>
+			</article>
+		</div>
+	}
+	<nav class="mt-6 flex justify-center space-x-2">
+		{{ searchQuery := "" }}
+		{{ r := route.ViewHome }}
+		if (search != "") {
+			{{ searchQuery = "&q=" + search }}
+			{{ r = route.ViewSearch }}
+		}
+		if paginator.Page() > 1 {
+			{{ prevUrl := templ.URL(url(r) + fmt.Sprintf("?page=%d%s", paginator.Page()-1, searchQuery)) }}
+			<a
+				hx-get={ string(prevUrl) }
+				href={ prevUrl }
+				class="px-3 py-1 border rounded hover:bg-gray-200"
+			>
+				Previous
+			</a>
+		}
+		for i := 1; i <= paginator.PagesCount(); i++ {
+			{{ class := "px-3 py-1 border rounded" }}
+			if i == paginator.Page() {
+				{{ class += " bg-blue-500 text-white" }}
+			} else {
+				{{ class += " hover:bg-gray-200" }}
+			}
+			{{ pageUrl := templ.URL(url(r) + fmt.Sprintf("?page=%d%s", i, searchQuery)) }}
+			<a
+				hx-get={ string(pageUrl) }
+				href={ pageUrl }
+				class={ class }
+			>
+				{ i }
+			</a>
+		}
+		if paginator.Page() < paginator.PagesCount() {
+			{{ nextUrl := templ.URL(url(r) + fmt.Sprintf("?page=%d%s", paginator.Page()+1, searchQuery)) }}
+			<a
+				hx-get={ string(nextUrl) }
+				href={ nextUrl }
+				class="px-3 py-1 border rounded hover:bg-gray-200"
+			>
+				Next
+			</a>
+		}
+	</nav>
+}

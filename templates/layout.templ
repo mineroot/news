@@ -1,0 +1,61 @@
+package templates
+
+import "github.com/mineroot/news/internal/route"
+
+templ Layout(url UrlGenerator, title, search string) {
+	<!DOCTYPE html>
+	<html lang="en" class="bg-gray-50 text-gray-900">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+		</head>
+		<body
+			hx-push-url="true"
+			hx-target="#main"
+			hx-select="#main"
+			class="flex flex-col min-h-screen"
+		>
+			<header class="bg-white shadow p-4">
+				<div class="max-w-4xl mx-auto flex items-center justify-between">
+					<div class="flex items-center space-x-4">
+						<h1 class="text-2xl font-bold">
+							<a hx-get="/" href="/">Posts</a>
+						</h1>
+						<form action="/search" hx-get="/search" method="get" class="inline">
+							<label>
+								<input
+									value={ search }
+									type="text"
+									name="q"
+									placeholder="Search..."
+									class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+								/>
+							</label>
+						</form>
+					</div>
+					{{ newPostUrl := templ.URL(url(route.ViewCreatePostForm)) }}
+					<a
+						hx-get={ string(newPostUrl) }
+						href={ newPostUrl }
+						class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+					>
+						Create
+					</a>
+				</div>
+			</header>
+			<main class="flex-1 p-4">
+				<div id="main" class="max-w-4xl mx-auto space-y-6">
+					{ children... }
+				</div>
+			</main>
+			<footer class="bg-gray-100 p-4">
+				<div class="max-w-4xl mx-auto text-center text-sm text-gray-600">
+					&copy; 2025 All rights reserved.
+				</div>
+			</footer>
+		</body>
+	</html>
+}
